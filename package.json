@@ -1,0 +1,16 @@
+{
+  "name": "xx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "dependencies": {
+    "selenium-webdriver": "*",
+    "express": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": ""
+  },
+  "author": "",
+  "license": "ISC"
+}
