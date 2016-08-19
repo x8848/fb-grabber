@@ -93,7 +93,7 @@ function grabGroup() {
                 // console.log(members.length);
                 // console.log(members);
                 // browser.quit();
-                finish = true;
+                // finish = true;
             });
         }
     });
