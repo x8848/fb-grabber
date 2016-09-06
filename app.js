@@ -11,7 +11,7 @@ var browser = new webdriver.Builder()
 var FACEBOOK = "https://www.facebook.com/";
 var SEE_MORE_BUTTON = "clearfix pam uiMorePager stat_elem morePager _52jv";
 
-var result, url, ids = [];
+var finish, url, ids = [];
 
 app.get('/page/:id', function (req, res) {
     ids = [];
@@ -22,19 +22,22 @@ app.get('/page/:id', function (req, res) {
             var id = text.split("/")[3];
             var url = FACEBOOK + "/search/" + id + "/likers/";
             browser.get(url);
-            grabPage();
+            grabPage(res);
         });
     });
-    res.send(ids);
 });
 
 app.get('/group/:id', function (req, res) {
     finish = false;
     ids = [];
     url = FACEBOOK + "groups/" + req.params.id + "/members/";
-    browser.get(url);
-    grabGroup();
-    res.send(members);
+    browser.get(url).then(function () {
+        var group = grabGroup();
+        return group;
+    }).then(function (ids) {
+        console.log(ids);
+        res.send(ids);
+    });
 });
 
 app.listen(3000, function () {
@@ -46,12 +49,12 @@ function login() {
     browser.findElement(By.id('email')).sendKeys('EnverNosov@bk.ru');
     browser.findElement(By.id('pass')).sendKeys('gJVFfj5B');
     browser.findElement(By.id('loginbutton')).click();
-    browser.sleep(1000);
+    // browser.sleep(1000);
 }
 
 login();
 
-function grabPage() {
+function grabPage(res) {
     browser.isElementPresent(By.id("browse_end_of_results_footer")).then(function (present) {
         if (!present) {
             browser.executeScript("window.scrollTo(0, document.body.scrollHeight)");
@@ -66,36 +69,34 @@ function grabPage() {
                     });
                 })
             }).then(function () {
-                // console.log(likers.length);
-                // console.log(likers);
-                // browser.quit();
+                res.send(ids);
+                // console.log(ids.length);
+                // console.log(ids);
             });
         }
     });
 }
 
-function grabGroup() {
-    browser.isElementPresent(By.className(SEE_MORE_BUTTON)).then(function (present) {
-        if (present) {
-            browser.findElement(By.className(SEE_MORE_BUTTON)).click();
-            browser.sleep(1000);
-            grabGroup();
-        } else {
-            browser.sleep(2000); // wait for all data to load
-            browser.findElements(By.css("div.fsl.fwb.fcb a")).then(function (people) {
-                people.forEach(function (person) {
-                    person.getAttribute("data-hovercard").then(function (text) {
-                        var id = text.split("?id=")[1].split("&")[0];
-                        ids.push(id);
-                    });
-                })
-            }).then(function () {
-                // console.log(members.length);
-                // console.log(members);
-                // browser.quit();
-                // finish = true;
-            });
-        }
-    });
 
+var findPersons = function (people) {
+    return Promise.all(people.map(function (person) {
+        return person.getAttribute("data-hovercard");
+    })).then(function (people) {
+        return people.map(p => p.split("?id=")[1].split("&")[0]);
+    });
 };
+
+function grabGroup() {
+    return browser.isElementPresent(By.className(SEE_MORE_BUTTON))
+        .then(function (present) {
+            if (present) {
+                browser.findElement(By.className(SEE_MORE_BUTTON)).click();
+                browser.sleep(1000);
+                return grabGroup();
+            } else {
+                browser.sleep(2000); // wait for all data to load
+                return browser.findElements(By.css("div.fsl.fwb.fcb a"));
+            }
+        })
+        .then(findPersons);
+}
