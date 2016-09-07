@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>facebook grabber</title>
+</head>
+<style>
+    .result {
+        border: 2px solid #73AD21;
+    }
+</style>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io();
+    function group() {
+        var input = document.getElementById("group");
+        var group = input.value;
+        socket.emit('group', group);
+        input.value = "";
+        var div = document.createElement("div");
+        div.setAttribute("id", group);
+        div.setAttribute("class", "result");
+        div.innerHTML = "please wait the result for " + group + "...";
+        document.getElementById("results").appendChild(div);
+    }
+    socket.on('groupResult', function (data) {
+        var div = document.getElementById(data.name);
+        div.innerHTML = "";
+        var name = document.createElement("p");
+        name.innerHTML = "name:" + data.name;
+        var time = document.createElement("p");
+        time.innerHTML = "time:" + data.time;
+        var total = document.createElement("p");
+        total.innerHTML = "total:" + data.total;
+        var ids = document.createElement("p");
+        ids.innerHTML = "ids:" + data.ids;
+        div.appendChild(name);
+        div.appendChild(time);
+        div.appendChild(total);
+        div.appendChild(ids);
+    });
+    function page() {
+        var input = document.getElementById("page");
+        var id = input.value;
+        socket.emit('page', id);
+        input.value = "";
+        var div = document.createElement("div");
+        div.setAttribute("id", id);
+        div.setAttribute("class", "result");
+        div.innerHTML = "please wait the result for " + id + "...";
+        document.getElementById("results").appendChild(div);
+    }
+    socket.on('pageResult', function (data) {
+        var div = document.getElementById(data.name);
+        div.innerHTML = "";
+        var name = document.createElement("p");
+        name.innerHTML = "name:" + data.name;
+        var time = document.createElement("p");
+        time.innerHTML = "time:" + data.time;
+        var total = document.createElement("p");
+        total.innerHTML = "total:" + data.total;
+        var ids = document.createElement("p");
+        ids.innerHTML = "ids:" + data.ids;
+        div.appendChild(name);
+        div.appendChild(time);
+        div.appendChild(total);
+        div.appendChild(ids);
+    });
+</script>
+<body>
+group:<input id="group"/>
+<button onclick="group()">send</button>
+page:<input id="page"/>
+<button onclick="page()">send</button>
+<div id="messages"/>
+<div id="results"/>
+</body>
+</html>
