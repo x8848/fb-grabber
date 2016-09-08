@@ -16,7 +16,7 @@ io.on('connection', function (socket) {
             .then(() => isMoreButton(browser))
             .then(p => loadAllPeople(p, browser))
             .then(findPeople)
-            .then(ids => sendResponse(name, ids, time));
+            .then(ids => sendResponse('group', name, ids, time));
         browser.quit();
     });
     socket.on('page', function (name) {
@@ -32,7 +32,7 @@ io.on('connection', function (socket) {
             .then(() => isAllPeople(browser))
             .then(p => scrollPeople(p, browser))
             .then(parsePeople)
-            .then(ids => sendResponse(name, ids, time));
+            .then(ids => sendResponse('page', name, ids, time));
         browser.quit();
     });
 });
@@ -108,8 +108,8 @@ var findPeople = function (people) {
     });
 };
 
-function sendResponse(name, ids, time) {
+function sendResponse(type, name, ids, time) {
     var date = new Date(Date.now() - time);
     time = date.getUTCMinutes() + ':' + date.getUTCSeconds();
-    io.emit('groupResult', {name: name, total: ids.length, time: time, ids: ids});
+    io.emit('result', {type: type, name: name, total: ids.length, time: time, ids: ids});
 }
