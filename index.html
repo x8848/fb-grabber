@@ -14,7 +14,7 @@
     var socket = io();
     function get(type) {
         var input = document.getElementById(type);
-        var id = input.value;
+        var id = input.value.replace(/\/|\s|\"|\'/g, '');
         socket.emit(type, id);
         input.value = "";
         var div = document.getElementById(id);
