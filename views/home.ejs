@@ -11,20 +11,19 @@
 </style>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var COUNT = 0;
     var FACEBOOK = "https://www.facebook.com/";
     var socket = io();
     function get() {
-        COUNT = COUNT + 1;
         var input = document.getElementById("url");
         var url = input.value;
         if (url.startsWith(FACEBOOK)) {
-            socket.emit("grab", {url: url, div: COUNT});
+            var unique = Math.random().toString(36).substr(2, 9); // unique due to seeding algorithm
+            socket.emit("grab", {url: url, div: unique});
             input.value = "";
-            var div = document.getElementById(COUNT);
+            var div = document.getElementById(unique);
             if (!div) {
                 div = document.createElement("div");
-                div.setAttribute("id", COUNT);
+                div.setAttribute("id", unique);
                 div.setAttribute("class", "result");
             }
             div.innerHTML = 'wait result for ' + url + ' ...';
@@ -36,19 +35,21 @@
     }
     socket.on("result", function (data) {
         var div = document.getElementById(data.div);
-        div.innerHTML = "";
-        var url = document.createElement("p");
-        url.innerHTML = "url: " + data.url;
-        var time = document.createElement("p");
-        time.innerHTML = "time: " + data.time;
-        var total = document.createElement("p");
-        total.innerHTML = "total: " + data.total;
-        var ids = document.createElement("p");
-        ids.innerHTML = "ids: " + data.ids;
-        div.appendChild(url);
-        div.appendChild(time);
-        div.appendChild(total);
-        div.appendChild(ids);
+        if (div) {
+            div.innerHTML = "";
+            var url = document.createElement("p");
+            url.innerHTML = "url: " + data.url;
+            var time = document.createElement("p");
+            time.innerHTML = "time: " + data.time;
+            var total = document.createElement("p");
+            total.innerHTML = "total: " + data.total;
+            var ids = document.createElement("p");
+            ids.innerHTML = "ids: " + data.ids;
+            div.appendChild(url);
+            div.appendChild(time);
+            div.appendChild(total);
+            div.appendChild(ids);
+        }
     });
 </script>
 <body>
@@ -59,7 +60,7 @@
 </form>
 <% } else { %>
 <p>Hello, <%= user.username %></p>
-url:<input id="url"/>
+url:<input style="width: 500px" id="url"/>
 <button onclick="get()">get</button>
 <br><br>
 <div id="results"/>
