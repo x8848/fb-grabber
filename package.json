@@ -5,13 +5,15 @@
   "dependencies": {
     "express": "*",
     "selenium-webdriver": "*",
-    "socket.io": "^1.4.8"
+    "socket.io": "*",
+    "body-parser": "*",
+    "cookie-parser": "*",
+    "diskdb": "*",
+    "ejs": "*",
+    "express-session": "*",
+    "passport": "*",
+    "passport-local": "*"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "node test.js",
-    "app": "node app.js"
-  },
-  "author": "",
+  "author": "xx",
   "license": "ISC"
 }

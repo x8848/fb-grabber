@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>accounts</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<p><a href="/">Go back</a></p>
+<table>
+    <tr>
+        <th>name</th>
+        <th>password</th>
+        <th>admin</th>
+        <th>edit</th>
+    </tr>
+    <% for(var i = 0; i < accounts.length; i++) { %>
+    <tr>
+        <td><%= accounts[i].username %></td>
+        <td><%= accounts[i].password %></td>
+        <td><%= accounts[i].admin %></td>
+        <td>
+            <form action="/remove" method="post">
+                <input style="visibility: hidden; width: 0;" name="id" value="<%= accounts[i]._id %>">
+                <button <%= (id == accounts[i]._id) ? "disabled" : '' %>>remove</button>
+            </form>
+        </td>
+    </tr>
+    <% } %>
+    <tr>
+        <form action="/create" method="post">
+            <td><input name="name"/></td>
+            <td><input name="password"/></td>
+            <td><input type="checkbox" name="admin" value="true"></td>
+            <td>
+                <button type="submit">create</button>
+            </td>
+        </form>
+    </tr>
+</table>
+<p><a href="/logout">Log out</a></p>
+</body>
+</html>

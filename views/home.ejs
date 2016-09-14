@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>facebook grabber</title>
+</head>
+<style>
+    .result {
+        border: 2px solid #73AD21;
+    }
+</style>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var COUNT = 0;
+    var FACEBOOK = "https://www.facebook.com/";
+    var socket = io();
+    function get() {
+        COUNT = COUNT + 1;
+        var input = document.getElementById("url");
+        var url = input.value;
+        if (url.startsWith(FACEBOOK)) {
+            socket.emit("grab", {url: url, div: COUNT});
+            input.value = "";
+            var div = document.getElementById(COUNT);
+            if (!div) {
+                div = document.createElement("div");
+                div.setAttribute("id", COUNT);
+                div.setAttribute("class", "result");
+            }
+            div.innerHTML = 'wait result for ' + url + ' ...';
+            document.getElementById("results").appendChild(div);
+        } else {
+            alert("URL should starts with " + FACEBOOK);
+            input.value = "";
+        }
+    }
+    socket.on("result", function (data) {
+        var div = document.getElementById(data.div);
+        div.innerHTML = "";
+        var url = document.createElement("p");
+        url.innerHTML = "url: " + data.url;
+        var time = document.createElement("p");
+        time.innerHTML = "time: " + data.time;
+        var total = document.createElement("p");
+        total.innerHTML = "total: " + data.total;
+        var ids = document.createElement("p");
+        ids.innerHTML = "ids: " + data.ids;
+        div.appendChild(url);
+        div.appendChild(time);
+        div.appendChild(total);
+        div.appendChild(ids);
+    });
+</script>
+<body>
+<% if (!user) { %>
+<p>Welcome! Please log in</a>.</p>
+<form action="/login" method="post">
+    username:<input name="username"/>password:<input name="password"/> <input type="submit"/>
+</form>
+<% } else { %>
+<p>Hello, <%= user.username %></p>
+url:<input id="url"/>
+<button onclick="get()">get</button>
+<br><br>
+<div id="results"/>
+<% if (user.admin) { %>
+<a href="/accounts">Manage accounts</a>
+<% } %>
+<p><a href="/logout">Log out</a></p>
+<% } %>
+</body>
+</html>
+
